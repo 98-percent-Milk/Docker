@@ -1,0 +1,20 @@
+{
+    "name": "docker_web_app",
+    "version": "1.0.0",
+    "description": "Node.js web app on Docker",
+    "author": "Margad Jantsan, and Adrian Lee",
+    "license": "ISC",
+    "main": "web_server.js",
+    "scripts": {
+        "start": "nodemon web_server.js"
+    },
+    "dependencies": {
+        "body-parser": "^1.19.2",
+        "ejs": "^3.1.6",
+        "express": "^4.16.1",
+        "express-validator": "^6.14.0",
+        "nodemon": "^2.0.15",
+        "request": "^2.88.2",
+        "request-promise": "^4.2.6"
+    }
+}
