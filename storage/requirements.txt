@@ -1,0 +1,7 @@
+connexion
+requests
+SQLAlchemy
+mysql-connector
+PyMySQL
+PyYAML
+connexion[swagger-ui]
