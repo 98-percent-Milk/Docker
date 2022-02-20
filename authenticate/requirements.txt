@@ -1,0 +1,4 @@
+connexion
+requests
+PyYAML
+connexion[swagger-ui]

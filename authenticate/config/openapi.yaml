@@ -1,0 +1,48 @@
+---
+openapi: 3.0.0
+info:
+  title: Job Searching API
+  description: This API recieves temperature from user
+  contact:
+    email: mjantsan@my.bcit.ca
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+tags:
+  - name : authenticate
+    description: Operations available for Authenticating client information
+paths:
+  /login/authenticate:
+    post:
+      tags:
+        - authenticate
+      summary: Authenticates clients credentials
+      operationId: app.authenticate
+      description: Authenticates clients credentials with hardcoded user database
+      responses:
+        '201':
+          description: 'Client information checks out'
+        '400':
+          description: 'Invalid input, object invalid'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Authenticate'
+        description: Authenticate item to add
+components:
+  schemas:
+    Authenticate:
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          example: Marcus
+        password:
+          type: string
+          format: password
+          example: MyNewPassword
+      type: object
