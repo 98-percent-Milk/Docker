@@ -3,6 +3,7 @@ from connexion import NoContent
 import requests
 import yaml
 from os.path import join, realpath
+from json import dumps
 
 
 def authenticate(body):
@@ -15,11 +16,13 @@ def authenticate(body):
     }
     username, password = body['username'], body['password']
     try:
-        return (NoContent, 201) if admin[username] == password else (NoContent, 400)
-    except KeyError:
-        return NoContent, 400
+        if admin[username] == password:
+            return dumps({"success": True, "statusCode": 201, 'ContentType': 'application/json'})
+        else:
+            return dumps({"success": False, "statusCode": 400, 'ContentType': 'application/json'})
 
-    return NoContent, 201
+    except:
+        return dumps({"success": False, "statusCode": 400, 'ContentType': 'application/json'})
 
 
 app = connexion.FlaskApp(__name__, specification_dir='')

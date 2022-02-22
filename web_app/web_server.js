@@ -14,21 +14,6 @@ const app = express();
 const urlencodedParser = bodyParser.urlencoded({ extended: false })
 app.set('view engine', 'ejs');
 let data = {}
-let options = {
-    method: "POST",
-    uri: 'http://localhost:',
-    headers: { 'content-type': 'application/json' },
-    json: {
-        "username": '',
-        "password": '',
-        "temperature_id": '',
-        "temperature": 0,
-        "year": 0,
-        "month": 0,
-        "day": 0,
-        "hour": 0,
-    }
-};
 
 app.get('', (req, res) => {
     res.render('index')
@@ -54,17 +39,29 @@ app.post('/validate', urlencodedParser, [
             alert
         })
     }
-    options.json["username"] = req.body.username
-    options.json["password"] = req.body.password
-    options.uri = "http://localhost:8100/login/authenticate"
-    request(options, function (error, response) {
-        if (response.statusCode == 201) {
-            res.render('temperature')
-            console.log("testing")
-        } else {
-            res.render('index')
-        }
+    request({
+        method: "POST",
+        uri: "http://localhost:8100/login/authenticate",
+        headers: { "content-type": "application/json" },
+        body: {
+            username: req.body.username,
+            password: req.body.password,
+        },
+        json: true,
     })
+        .then(function (body) {
+            if (body.statusCode == 201) {
+                console.log("Welcome Admin")
+                res.render("temperature")
+            } else {
+                console.log("Not Welcome")
+                res.render('index')
+            }
+        })
+        .catch(function (err) {
+            console.log(err.name, err.statusCode);
+            res.render('index')
+        })
 })
 
 app.post('/temperature', urlencodedParser, (req, res) => {
@@ -75,17 +72,28 @@ app.post('/temperature', urlencodedParser, (req, res) => {
             alert
         })
     }
-    options.json['temperature'] = req.body.temperature
-    options.uri = "http://localhost:8090/readings/temperature"
-    request(options, function (error, response) {
-        if (response.statusCode == 201) {
-            console.log("Valid")
-            res.render('temperature')
-        } else {
-            console.log("INVALID")
-            res.render('temperature')
-        }
+    request({
+        method: "POST",
+        uri: "http://localhost:8090/readings/temperature",
+        headers: { "content-type": "application/json" },
+        body: {
+            temperature: req.body.temperature,
+        },
+        json: true,
     })
+        .then(function (body) {
+            if (body.statusCode == 201) {
+                console.log("Temperature Saved")
+                res.render("temperature")
+            } else {
+                console.log("Temperature Not Saved")
+                res.render('index')
+            }
+        })
+        .catch(function (err) {
+            console.log(err.name, err.statusCode);
+            res.render('index')
+        })
 })
 
 app.listen(PORT, HOST);
