@@ -3,3 +3,4 @@ PyYAML
 connexion[swagger-ui]
 pymongo
 mysql-connector
+pymongo

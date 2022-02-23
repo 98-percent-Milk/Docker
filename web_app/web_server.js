@@ -96,13 +96,26 @@ app.post('/temperature', urlencodedParser, (req, res) => {
     con.connect(function (err) {
         if (err) throw err;
         console.log("connects to db container");
-        var sql = `INSERT INTO events (temperature) VALUES ("${crypto.randomUUID()}","${req.body.temperature}")`;
+        var sql = `INSERT INTO Temperature (id, temperature) VALUES ("${crypto.randomUUID()}","${req.body.temperature}")`;
         con.query(sql, function (err, result) {
             if (err) {
+                console.log(err)
                 con.end(function (err) { })
                 console.log("didnt work");
             } else {
                 res.render('temperature')
+                request({
+                    method: "GET",
+                    uri: "http://process:8010/stats",
+                    headers: { 'content-type': 'application/json' },
+                    json: true,
+                }, function (error, response) {
+                    if (response.statusCode == 201) {
+                        console.log("updated the mongodb")
+                    } else {
+                        console.log("cant update the mongo db with new stats")
+                    }
+                })
                 console.log("added thing to database");
             }
         })

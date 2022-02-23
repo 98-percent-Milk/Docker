@@ -1,3 +1,4 @@
-CREATE TABLE events(
-    temperature varchar(20) NOT NULL
+CREATE TABLE Temperature(
+    id varchar(50) NOT NULL,
+    temperature float NOT NULL
 )
