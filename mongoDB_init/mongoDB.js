@@ -17,7 +17,7 @@ db = db.getSiblingDB('calulated_data');
 
 db.createCollection('stats');
 
-db.computed_stats.insertOne([
+db.stats.insertOne([
  {
     "Average Temp": "null",
     "Max Temp": "null",
