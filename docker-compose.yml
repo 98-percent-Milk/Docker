@@ -7,10 +7,24 @@ services:
     hostname: web-app
     depends_on:
       - db
+      - db2
       - auth
     ports:
       - target: 8080
         published: 8080
+        protocol: tcp
+        mode: host
+
+  process:
+    container_name: process
+    build: ./processing
+    hostname: process
+    depends_on:
+      - db
+      - db2
+    ports:
+      - target: 8010
+        published: 8010
         protocol: tcp
         mode: host
 
@@ -35,10 +49,12 @@ services:
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: MyNewPass1
+      MONGO_INITDB_ROOT_PASSWORD: MyNewPass1!
     volumes:
       - mongo_db:/data/db
       - ./.docker/mongodb/initdb.d/:/docker-entrypoint-initdb.d/
+    ports:
+      - 27017:27017
 
   auth:
     container_name: authenticate

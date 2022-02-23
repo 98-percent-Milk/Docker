@@ -1,4 +1,5 @@
 connexion
-requests
 PyYAML
 connexion[swagger-ui]
+pymongo
+mysql-connector

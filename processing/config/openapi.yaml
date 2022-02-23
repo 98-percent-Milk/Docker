@@ -1,0 +1,27 @@
+---
+openapi: 3.0.0
+info:
+  title: Job Searching API
+  description: This API recieves temperature from user
+  contact:
+    email: mjantsan@my.bcit.ca
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+tags:
+  - name : temperature
+    description: Operations available for Temperature readings
+paths:
+  /stats:
+    get:
+      tags:
+        - temperature
+      summary: reports a outside temperature
+      operationId: app.statistics
+      description: Adds a new outside temperature reading to the database
+      responses:
+        '201':
+          description: 'temperature object created'
+        '400':
+          description: 'Invalid input, object invalid'
