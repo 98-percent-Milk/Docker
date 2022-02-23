@@ -4,6 +4,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const { check, validationResult } = require('express-validator');
 const request = require('request-promise');
+const mysql = require('mysql')
 // Constants
 const PORT = 8080;
 const HOST = '0.0.0.0';
@@ -14,6 +15,21 @@ const app = express();
 const urlencodedParser = bodyParser.urlencoded({ extended: false })
 app.set('view engine', 'ejs');
 let data = {}
+let options = {
+    method: "POST",
+    uri: 'http://localhost:',
+    headers: { 'content-type': 'application/json' },
+    json: {
+        "username": '',
+        "password": '',
+        "temperature_id": '',
+        "temperature": 0,
+        "year": 0,
+        "month": 0,
+        "day": 0,
+        "hour": 0,
+    }
+};
 
 app.get('', (req, res) => {
     res.render('index')
@@ -39,29 +55,17 @@ app.post('/validate', urlencodedParser, [
             alert
         })
     }
-    request({
-        method: "POST",
-        uri: "http://localhost:8100/login/authenticate",
-        headers: { "content-type": "application/json" },
-        body: {
-            username: req.body.username,
-            password: req.body.password,
-        },
-        json: true,
-    })
-        .then(function (body) {
-            if (body.statusCode == 201) {
-                console.log("Welcome Admin")
-                res.render("temperature")
-            } else {
-                console.log("Not Welcome")
-                res.render('index')
-            }
-        })
-        .catch(function (err) {
-            console.log(err.name, err.statusCode);
+    options.json["username"] = req.body.username
+    options.json["password"] = req.body.password
+    options.uri = "http://authenticate:8100/login/authenticate"
+    request(options, function (error, response) {
+        if (response.statusCode == 201) {
+            res.render('temperature')
+            console.log("testing")
+        } else {
             res.render('index')
-        })
+        }
+    })
 })
 
 app.post('/temperature', urlencodedParser, (req, res) => {
@@ -72,29 +76,38 @@ app.post('/temperature', urlencodedParser, (req, res) => {
             alert
         })
     }
-    request({
-        method: "POST",
-        uri: "http://localhost:8090/readings/temperature",
-        headers: { "content-type": "application/json" },
-        body: {
-            temperature: req.body.temperature,
-        },
-        json: true,
-    })
-        .then(function (body) {
-            if (body.statusCode == 201) {
-                console.log("Temperature Saved")
-                res.render("temperature")
+    options.json['temperature'] = req.body.temperature
+    options.uri = "http://storage:3306"
+    // request(options, function (error, response) {
+    //     if (response.statusCode == 201) {
+    //         console.log("Valid")
+    //         res.render('temperature')
+    //     } else {
+    //         console.log("INVALID")
+    //         res.render('temperature')
+    //     }
+    // })
+    var con = mysql.createConnection({
+        host: "storage",
+        user: "root",
+        password: "MyNewPass1!",
+        database: "events"
+    });
+
+    con.connect(function(err) {
+        if (err) throw err;
+        console.log("connects to db container");
+        var sql = `INSERT INTO events (temperature) VALUES ("${req.body.temperature}")`;
+        con.query(sql, function (err, result) {
+            if (err) {
+                con.end(function(err) {})
+                console.log("didnt work");
             } else {
-                console.log("Temperature Not Saved")
-                res.render('index')
+                res.render('temperature')
+                console.log("added thing to database");
             }
         })
-        .catch(function (err) {
-            console.log(err.name, err.statusCode);
-            res.render('index')
-        })
+    })
 })
-
 app.listen(PORT, HOST);
-console.log(`Running on http://${HOST}:${PORT}`);
+console.log(`Running on http://${HOST}:${PORT}`)

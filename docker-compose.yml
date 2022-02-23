@@ -1,0 +1,57 @@
+version: '1'
+
+services:
+  app:
+    container_name: web-app
+    build: ./web_app
+    hostname: web-app
+    depends_on:
+      - db
+      - auth
+    ports:
+      - target: 8080
+        published: 8080
+        protocol: tcp
+        mode: host
+
+  db:
+    container_name: storage
+    image: mysql:latest
+    command: mysqld --default-authentication-plugin=mysql_native_password
+    restart: always
+    hostname: storage
+    environment:
+      - MYSQL_DATABASE=events
+      - MYSQL_ROOT_PASSWORD=MyNewPass1!
+    volumes:
+      - mysql_db:/var/lib/mysql
+      - ./db/init.sql/mysql_dump:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - 3306:3306
+
+  db2:
+    container_name: mongo_storage
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: MyNewPass1
+    volumes:
+      - mongo_db:/data/db
+      - ./.docker/mongodb/initdb.d/:/docker-entrypoint-initdb.d/
+
+  auth:
+    container_name: authenticate
+    build: ./authenticate
+    hostname: authenticate
+
+    ports:
+      - target: 8100
+        published: 8100
+        protocol: tcp
+        mode: host
+volumes:
+  mysql_db:
+    driver: local
+  mongo_db:
+    driver: local

@@ -1,0 +1,3 @@
+CREATE TABLE events(
+    temperature varchar(20) NOT NULL
+)
