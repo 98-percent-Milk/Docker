@@ -16,16 +16,35 @@ const app = express();
 const urlencodedParser = bodyParser.urlencoded({ extended: false })
 app.set('view engine', 'ejs');
 
+let con = mysql.createConnection({
+    host: "storage",
+    user: "root",
+    password: "MyNewPass1!",
+    database: "events"
+});
+
+con.query(`CREATE TABLE IF NOT EXISTS Temperature(
+    id varchar(250),
+    temperature float
+)`, function (err, result) {
+    if (err) {
+        con.end(function (err) { })
+        console.log("didnt work");
+    } else {
+        console.log("Created database");
+    }
+});
+
 app.get('', (req, res) => {
-    res.render('index')
+    res.render('index');
 })
 
 app.get('/validate', (req, res) => {
-    res.render('validate')
+    res.render('validate');
 })
 
 app.get('/temperature', (req, res) => {
-    res.render('temperature')
+    res.render('temperature');
 })
 
 app.post('/validate', urlencodedParser, [
@@ -77,7 +96,7 @@ app.post('/temperature', urlencodedParser, (req, res) => {
     con.connect(function (err) {
         if (err) throw err;
         console.log("connects to db container");
-        var sql = `INSERT INTO events (temperature) VALUES ("${crypto.randomUUID()},${req.body.temperature}")`;
+        var sql = `INSERT INTO events (temperature) VALUES ("${crypto.randomUUID()}","${req.body.temperature}")`;
         con.query(sql, function (err, result) {
             if (err) {
                 con.end(function (err) { })
